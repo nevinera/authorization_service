@@ -14,13 +14,16 @@ func (conn Connection) createUsersTable() error {
   }
 }
 
-func (conn Connection) getUser(uuid string) (User, error) {
-  user := User{}
-  query := "SELECT * FROM users where uuid = $1"
+func (conn Connection) GetUser(uuid string) (*User, bool, error) {
+  users := []User{}
+  query := "SELECT * FROM users where uuid=?"
+  err := conn.dbConn.Select(&users, query, uuid)
 
-  if err := conn.dbConn.Get(&user, query, uuid); err != nil {
-    return user, err
+  if err != nil {
+    return nil, false, err
+  } else if len(users) == 0 {
+    return nil, false, nil
   } else {
-    return user, nil
+    return &users[0], true, err
   }
 }

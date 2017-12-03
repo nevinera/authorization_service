@@ -1,12 +1,15 @@
 package main
 
 import (
+  "os"
   "log"
   "strconv"
   "net/http"
   "time"
   "encoding/json"
   "github.com/gorilla/mux"
+  "github.com/nevinera/authorization_service/db"
+  "github.com/nevinera/authorization_service/ctrl"
 )
 
 type User struct {
@@ -25,16 +28,6 @@ func sendError(w http.ResponseWriter, status int, msg string) {
 }
 
 var users = make(map[string]User)
-
-func GetUser(w http.ResponseWriter, r *http.Request) {
-  params := mux.Vars(r)
-  if user, included := users[params["uuid"]]; included {
-    w.WriteHeader(http.StatusOK)
-    json.NewEncoder(w).Encode(user)
-  } else {
-    sendError(w, http.StatusNotFound, "That user was not found")
-  }
-}
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
   params := mux.Vars(r)
@@ -59,9 +52,22 @@ func DestroyUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+  connectionString, wasSet := os.LookupEnv("DATABASE_URL")
+  if !wasSet {
+    log.Fatal("DATABASE_URL must be set")
+  }
+
+  conn, err := db.NewConnection(connectionString)
+  if err != nil {
+    log.Fatal("Could not connect to database")
+  }
+
+  conn.CreateDatabase()
+
   router := mux.NewRouter()
-  router.HandleFunc("/users/{uuid}", GetUser).Methods("GET")
+  router.Handle("/users/{uuid}", ctrl.UsersShowHandler(conn)).Methods("GET")
   router.HandleFunc("/users/{uuid}", CreateUser).Methods("PUT")
   router.HandleFunc("/users/{uuid}", DestroyUser).Methods("DELETE")
+
   log.Fatal(http.ListenAndServe(":3000", router))
 }

@@ -8,20 +8,13 @@ import (
 type Connection struct {
   configString string
   dbConn *sqlx.DB
-  connected bool
 }
 
-func NewConnection(configString string) (Connection, error) {
+func NewConnection(configString string) (*Connection, error) {
   conn := Connection{configString: configString}
-  if dbConn, err := sqlx.Connect("mysql", configString); err != nil {
-    conn.connected = false
-    conn.dbConn = nil
-    return conn, err
-  } else {
-    conn.connected = true
-    conn.dbConn = dbConn
-    return Connection{configString: configString, dbConn: dbConn}, nil
-  }
+  dbConn := sqlx.MustConnect("mysql", configString)
+  conn.dbConn = dbConn
+  return &Connection{configString: configString, dbConn: dbConn}, nil
 }
 
 func (conn Connection) CreateDatabase() {
