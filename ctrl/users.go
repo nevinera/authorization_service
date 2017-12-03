@@ -38,3 +38,21 @@ func UsersCreateHandler(conn *db.Connection) http.Handler {
     }
   })
 }
+
+func UsersDestroyHandler(conn *db.Connection) http.Handler {
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    params := mux.Vars(r)
+    user, destroyed, err := conn.DestroyUser(params["uuid"])
+
+    if err != nil {
+      sendError(w, http.StatusInternalServerError, err.Error())
+    } else if user == nil {
+      sendError(w, http.StatusNotFound, "User not found")
+    } else if destroyed == false {
+      sendError(w, http.StatusInternalServerError, "Unable to destroy user")
+    } else {
+      w.WriteHeader(http.StatusOK)
+      json.NewEncoder(w).Encode(user)
+    }
+  })
+}

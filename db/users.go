@@ -46,3 +46,20 @@ func (conn Connection) CreateUser(uuid string) (*User, bool, error) {
     return createdUser, true, nil
   }
 }
+
+func (conn Connection) DestroyUser(uuid string) (*User, bool, error) {
+  user, found, fetchErr := conn.GetUser(uuid)
+  if fetchErr != nil {
+    return nil, false, fetchErr
+  } else if found == false {
+    return nil, false, nil
+  }
+
+  stmt := "DELETE FROM users WHERE uuid = ?"
+  _, deleteErr := conn.dbConn.Query(stmt, uuid)
+  if deleteErr != nil {
+    return user, false, deleteErr
+  } else {
+    return user, true, nil
+  }
+}
