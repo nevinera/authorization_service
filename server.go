@@ -3,32 +3,22 @@ package main
 import (
   "os"
   "log"
-  "net/http"
-  "github.com/gorilla/mux"
-  "github.com/nevinera/authorization_service/db"
-  "github.com/nevinera/authorization_service/ctrl"
+  "github.com/nevinera/authorization_service/server"
 )
 
 func main() {
-  connectionString, wasSet := os.LookupEnv("DATABASE_URL")
-  if !wasSet {
-    log.Fatal("DATABASE_URL must be set")
+  dbUrl, dbWasSet := os.LookupEnv("DATABASE_URL")
+  if !dbWasSet {
+    dbUrl = "root:@tcp(localhost:3306)/authorization"
   }
 
-  conn, err := db.NewConnection(connectionString)
+  listenString, listenWasSet := os.LookupEnv("LISTEN")
+  if !listenWasSet {
+    listenString = ":3000"
+  }
+
+  err := server.Run(listenString, dbUrl)
   if err != nil {
-    log.Fatal("Could not connect to database")
+    log.Fatal(err)
   }
-
-  conn.CreateDatabase()
-
-  router := mux.NewRouter()
-  router.Handle("/users/{uuid}", ctrl.UsersShowHandler(conn)).Methods("GET")
-  router.Handle("/users/{uuid}", ctrl.UsersCreateHandler(conn)).Methods("PUT")
-  router.Handle("/users/{uuid}", ctrl.UsersDestroyHandler(conn)).Methods("DELETE")
-  router.Handle("/groups/{uuid}", ctrl.GroupsShowHandler(conn)).Methods("GET")
-  router.Handle("/groups/{uuid}", ctrl.GroupsCreateHandler(conn)).Methods("PUT")
-  router.Handle("/groups/{uuid}", ctrl.GroupsDestroyHandler(conn)).Methods("DELETE")
-
-  log.Fatal(http.ListenAndServe(":3000", router))
 }
