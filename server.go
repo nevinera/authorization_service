@@ -17,13 +17,15 @@ type User struct {
   CreatedAt time.Time
 }
 
+type httpError struct {
+  message string `json:"error"`
+  status int
+  occurred_at time.Time
+}
+
 func sendError(w http.ResponseWriter, status int, msg string) {
   w.WriteHeader(status)
-  errorData := map[string]string{
-    "error": msg,
-    "status": strconv.Itoa(status),
-    "occurred_at": time.Now().String(),
-  }
+  errorData := httpError{message: msg, status: status, occurred_at: time.Now()}
   json.NewEncoder(w).Encode(errorData)
 }
 
