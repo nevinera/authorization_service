@@ -4,10 +4,10 @@ import (
   "net/http"
   "encoding/json"
   "github.com/gorilla/mux"
-  "github.com/nevinera/authorization_service/db"
+  "github.com/nevinera/authorization_service/data"
 )
 
-func UsersShowHandler(conn *db.Connection) http.Handler {
+func UsersShowHandler(conn *data.Connection) http.Handler {
   return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
 
@@ -23,7 +23,7 @@ func UsersShowHandler(conn *db.Connection) http.Handler {
   })
 }
 
-func UsersCreateHandler(conn *db.Connection) http.Handler {
+func UsersCreateHandler(conn *data.Connection) http.Handler {
   return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
     user, created, err := conn.CreateUser(params["uuid"])
@@ -39,7 +39,7 @@ func UsersCreateHandler(conn *db.Connection) http.Handler {
   })
 }
 
-func UsersDestroyHandler(conn *db.Connection) http.Handler {
+func UsersDestroyHandler(conn *data.Connection) http.Handler {
   return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
     user, destroyed, err := conn.DestroyUser(params["uuid"])

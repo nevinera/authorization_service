@@ -3,12 +3,12 @@ package server
 import (
   "net/http"
   "github.com/gorilla/mux"
-  "github.com/nevinera/authorization_service/db"
+  "github.com/nevinera/authorization_service/data"
   "github.com/nevinera/authorization_service/ctrl"
 )
 
 func Run(listenString string, dbUrl string) error {
-  conn, err := db.NewConnection(dbUrl)
+  conn, err := data.NewConnection(dbUrl)
   if err != nil {
     return err
   }
@@ -20,7 +20,7 @@ func Run(listenString string, dbUrl string) error {
   return nil
 }
 
-func buildRouter(conn *db.Connection) *mux.Router {
+func buildRouter(conn *data.Connection) *mux.Router {
   router := mux.NewRouter()
 
   router.Handle("/users/{uuid}", ctrl.UsersShowHandler(conn)).Methods("GET")

@@ -4,10 +4,10 @@ import (
   "net/http"
   "encoding/json"
   "github.com/gorilla/mux"
-  "github.com/nevinera/authorization_service/db"
+  "github.com/nevinera/authorization_service/data"
 )
 
-func GroupsShowHandler(conn *db.Connection) http.Handler {
+func GroupsShowHandler(conn *data.Connection) http.Handler {
   return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
 
@@ -23,7 +23,7 @@ func GroupsShowHandler(conn *db.Connection) http.Handler {
   })
 }
 
-func GroupsCreateHandler(conn *db.Connection) http.Handler {
+func GroupsCreateHandler(conn *data.Connection) http.Handler {
   return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
     group, created, err := conn.CreateGroup(params["uuid"])
@@ -39,7 +39,7 @@ func GroupsCreateHandler(conn *db.Connection) http.Handler {
   })
 }
 
-func GroupsDestroyHandler(conn *db.Connection) http.Handler {
+func GroupsDestroyHandler(conn *data.Connection) http.Handler {
   return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
     group, destroyed, err := conn.DestroyGroup(params["uuid"])

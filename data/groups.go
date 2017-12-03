@@ -1,4 +1,4 @@
-package db
+package data
 
 type Group struct {
   UUID string `db:"uuid"`

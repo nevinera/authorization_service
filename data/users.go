@@ -1,4 +1,4 @@
-package db
+package data
 
 type User struct {
   UUID string `db:"uuid"`
