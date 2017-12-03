@@ -19,4 +19,5 @@ func NewConnection(configString string) (*Connection, error) {
 
 func (conn Connection) CreateDatabase() {
   conn.createUsersTable()
+  conn.createGroupsTable()
 }

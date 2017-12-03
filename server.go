@@ -26,6 +26,9 @@ func main() {
   router.Handle("/users/{uuid}", ctrl.UsersShowHandler(conn)).Methods("GET")
   router.Handle("/users/{uuid}", ctrl.UsersCreateHandler(conn)).Methods("PUT")
   router.Handle("/users/{uuid}", ctrl.UsersDestroyHandler(conn)).Methods("DELETE")
+  router.Handle("/groups/{uuid}", ctrl.GroupsShowHandler(conn)).Methods("GET")
+  router.Handle("/groups/{uuid}", ctrl.GroupsCreateHandler(conn)).Methods("PUT")
+  router.Handle("/groups/{uuid}", ctrl.GroupsDestroyHandler(conn)).Methods("DELETE")
 
   log.Fatal(http.ListenAndServe(":3000", router))
 }
