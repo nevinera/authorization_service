@@ -27,3 +27,22 @@ func (conn Connection) GetUser(uuid string) (*User, bool, error) {
     return &users[0], true, err
   }
 }
+
+func (conn Connection) CreateUser(uuid string) (*User, bool, error) {
+  user, found, fetchErr := conn.GetUser(uuid)
+  if fetchErr != nil {
+    return user, false, fetchErr
+  } else if found == true {
+    return user, false, nil
+  }
+
+  createdUser := &User{UUID: uuid}
+  stmt := "INSERT INTO users (uuid) VALUES (:uuid)"
+  varMap := map[string]interface{}{"uuid": uuid}
+  _, createErr := conn.dbConn.NamedQuery(stmt, varMap)
+  if createErr != nil {
+    return createdUser, false, createErr
+  } else {
+    return createdUser, true, nil
+  }
+}

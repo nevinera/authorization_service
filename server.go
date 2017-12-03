@@ -3,7 +3,6 @@ package main
 import (
   "os"
   "log"
-  "strconv"
   "net/http"
   "time"
   "encoding/json"
@@ -31,18 +30,6 @@ func sendError(w http.ResponseWriter, status int, msg string) {
 
 var users = make(map[string]User)
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
-  params := mux.Vars(r)
-  if _, included := users[params["uuid"]]; included {
-    sendError(w, http.StatusConflict, "That user already exists")
-  } else {
-    user := User{Uuid: params["uuid"], CreatedAt: time.Now()}
-    users[params["uuid"]] = user
-    w.WriteHeader(http.StatusCreated)
-    json.NewEncoder(w).Encode(user)
-  }
-}
-
 func DestroyUser(w http.ResponseWriter, r *http.Request) {
   params := mux.Vars(r)
   if user, included := users[params["uuid"]]; included {
@@ -68,7 +55,7 @@ func main() {
 
   router := mux.NewRouter()
   router.Handle("/users/{uuid}", ctrl.UsersShowHandler(conn)).Methods("GET")
-  router.HandleFunc("/users/{uuid}", CreateUser).Methods("PUT")
+  router.Handle("/users/{uuid}", ctrl.UsersCreateHandler(conn)).Methods("PUT")
   router.HandleFunc("/users/{uuid}", DestroyUser).Methods("DELETE")
 
   log.Fatal(http.ListenAndServe(":3000", router))
